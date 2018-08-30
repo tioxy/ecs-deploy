@@ -52,6 +52,7 @@ Optional arguments:
     -t | --timeout               Default is 90s. Script monitors ECS Service for new task definition to be running.
     -e | --tag-env-var           Get image tag name from environment variable. If provided this will override value specified in image name argument.
     -to | --tag-only             New tag to apply to all images defined in the task (multi-container task). If provided this will override value specified in image name argument.
+    -nc | --network-configuration
     --max-definitions            Number of Task Definition Revisions to persist before deregistering oldest revisions.
     --enable-rollback            Rollback task definition if new version is not running before TIMEOUT
     --force-new-deployment       Force a new deployment of the service. Default is false.
@@ -466,7 +467,7 @@ function waitForGreenDeployment {
 
 function runTask {
   echo "Run task: $NEW_TASKDEF";
-  $AWS_ECS run-task --cluster $CLUSTER --task-definition $NEW_TASKDEF > /dev/null
+  $AWS_ECS run-task --cluster $CLUSTER --task-definition $NEW_TASKDEF --network-configuration $NETWORK_CONFIGURATION --launch-type FARGATE > /dev/null
 }
 
 ######################################################
@@ -555,6 +556,10 @@ if [ "$BASH_SOURCE" == "$0" ]; then
                 TAGONLY="$2"
                 shift
                 ;;
+	    -nc|--network-configuration)
+		NETWORK_CONFIGURATION="$2"
+		shift
+		;;
             --max-definitions)
                 MAX_DEFINITIONS="$2"
                 shift
