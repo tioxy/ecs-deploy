@@ -53,6 +53,7 @@ Optional arguments:
     -e | --tag-env-var           Get image tag name from environment variable. If provided this will override value specified in image name argument.
     -to | --tag-only             New tag to apply to all images defined in the task (multi-container task). If provided this will override value specified in image name argument.
     -nc | --network-configuration
+    -lc | --launch-type          Selects which runtime will be used between EC2 or FARGATE
     --max-definitions            Number of Task Definition Revisions to persist before deregistering oldest revisions.
     --enable-rollback            Rollback task definition if new version is not running before TIMEOUT
     --force-new-deployment       Force a new deployment of the service. Default is false.
@@ -467,7 +468,7 @@ function waitForGreenDeployment {
 
 function runTask {
   echo "Run task: $NEW_TASKDEF";
-  $AWS_ECS run-task --cluster $CLUSTER --task-definition $NEW_TASKDEF --network-configuration $NETWORK_CONFIGURATION --launch-type FARGATE > /dev/null
+  $AWS_ECS run-task --cluster $CLUSTER --task-definition $NEW_TASKDEF --network-configuration $NETWORK_CONFIGURATION --launch-type $LAUNCH_CONFIGURATION > /dev/null
 }
 
 ######################################################
@@ -558,6 +559,10 @@ if [ "$BASH_SOURCE" == "$0" ]; then
                 ;;
 	    -nc|--network-configuration)
 		NETWORK_CONFIGURATION="$2"
+		shift
+		;;
+	    -lc|--launch-configuration)
+		LAUNCH_CONFIGURATION="$2"
 		shift
 		;;
             --max-definitions)
